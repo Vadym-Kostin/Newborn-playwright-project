@@ -7,7 +7,7 @@ export class DbHelper {
         }).catch(error => console.log(error));
     }
 
-    static async validateCategoryAbsenceInDB(categoryId: any) {
+    static async findCategoryInDB(categoryId: any) {
         await this.connect();
         const categorySchema = new mongoose.Schema({});
         const categoryModel = mongoose.model("categories", categorySchema);

@@ -77,18 +77,21 @@ test("Create a category and add positions", async ({ page }) => {
   test("Filter the order", async ({ page }) => {
     const historyMenuItem = page.getByRole("listitem").filter({ hasText: "Історія" });
     await historyMenuItem.click();
-    await ApiHelper.filterById(orderNumber);
+    await ApiHelper.filterById(token, orderNumber);
   });
 
-test("Delete the created categoty and validate absence in DB", async ({ page }) => {
+test("Delete the created category and validate its absence in DB", async ({ page }) => {
     const categoriesMenuItem = page.getByRole("listitem").filter({ hasText: "Асортимент" });
     await categoriesMenuItem.click();
+    const toast = page.locator(".toast");
     await page.waitForLoadState("networkidle");
     await page.locator(".collection-item").filter({ hasText: "Test category" }).click();
     await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     page.on("dialog", dialog => dialog.accept());
     await page.getByRole("button").filter({ hasText: "delete" }).click();
-    await page.waitForTimeout(5000);
-    // await page.waitForLoadState("networkidle");
-    // console.log(await DbHelper.validateCategoryAbsenceInDB(categoryId));
+    await page.waitForLoadState("domcontentloaded");
+    await expect(toast).toBeVisible();
+    const foundCategory = await DbHelper.findCategoryInDB(categoryId);
+    expect(foundCategory).toBeFalsy();
 });

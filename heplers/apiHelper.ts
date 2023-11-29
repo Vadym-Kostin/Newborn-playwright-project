@@ -31,14 +31,16 @@ export class ApiHelper {
         return serializedResponse;
     }
 
-    static async filterById(orderNumber: string): Promise<[]> {
+    static async filterById(token: string, orderNumber: string): Promise<void> {
+        const url = `api/order?order=${orderNumber}`;
         const context = await this.context();
-        const response = await context.get("api/order", {
-            params: {
-                "order": orderNumber
+        const response = await context.get(url, {
+            headers: {
+                Authorization: token,
             }
         });
+        const serializedResponse = await response.json();
         expect(response.ok()).toBeTruthy();
-        expect(response.body.length).toEqual(1);
+        expect(serializedResponse).toHaveLength(1);
     }
 }
